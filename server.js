@@ -44,39 +44,7 @@ const sendResponse = (res, statusCode, success, message, data = null) => {
 
 // --- ENDPOINTS DU SYSTÈME D'AMIS (déjà dans le server.js original) ---
 
-app.post('/findOrCreateUser', async (req, res) => {
     const { pseudo } = req.body;
-    if (!pseudo || pseudo.trim() === '') {
-        return sendResponse(res, 400, false, 'Le pseudo est requis et ne peut pas être vide.');
-    }
-    try {
-        const snapshot = await db.ref('users').orderByChild('pseudo').equalTo(pseudo).limitToFirst(1).once('value');
-        if (snapshot.exists()) {
-            const existingUserId = Object.keys(snapshot.val())[0];
-            const existingUserData = snapshot.val()[existingUserId];
-            console.log(`Utilisateur existant trouvé: ${existingUserData.pseudo} (${existingUserId})`);
-            return sendResponse(res, 200, true, 'Utilisateur trouvé et connecté.', { id: existingUserId, pseudo: existingUserData.pseudo });
-        } else {
-            const newUserId = uuidv4(); // Utilise un ID unique
-            const newUserRef = db.ref('users').child(newUserId);
-            await newUserRef.set({
-                userId: newUserId,
-                pseudo: pseudo,
-                profile: { bio: "", avatarUrl: "", customStatus: "" },
-                gameData: { mainScore: 0, level: 0 }, // Ajout des champs de données de jeu
-                friends: {},
-                friendRequestsReceived: {},
-                friendRequestsSent: {},
-                createdAt: admin.database.ServerValue.TIMESTAMP
-            });
-            console.log(`Nouvel utilisateur créé: ${pseudo} (${newUserId})`);
-            return sendResponse(res, 201, true, 'Nouvel utilisateur créé avec succès !', { id: newUserId, pseudo: pseudo });
-        }
-    } catch (error) {
-        console.error('Erreur lors de la recherche ou création de l\'utilisateur :', error);
-        sendResponse(res, 500, false, 'Échec de la recherche ou création de l\'utilisateur.', { error: error.message });
-    }
-});
 
 // GET /getUserDetails/:id (inchangé)
 app.get('/getUserDetails/:id', async (req, res) => {
